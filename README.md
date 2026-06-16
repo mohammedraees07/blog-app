@@ -282,16 +282,15 @@ F -->|Yes| H[Allow Request]
 flowchart TD
 
 A[Admin Route Request]
-
 --> B[Auth Middleware]
 
 B --> C[Read User Role]
 
-C --> D{Role == Admin?}
+C --> D{Is Admin}
 
-D -->|No| E[403 Forbidden]
+D -->|No| E[Forbidden]
 
-D -->|Yes| F[next()]
+D -->|Yes| F[Continue]
 ```
 
 ---
