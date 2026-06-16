@@ -203,23 +203,22 @@ H --> I[Return Token]
 ```mermaid
 flowchart TD
 
-A[Protected Route Request]
+A[Request]
+--> B[Read Header]
 
---> B[Read Authorization Header]
+B --> C{Token Exists}
 
-B --> C{Token Exists?}
-
-C -->|No| D[401 Unauthorized]
+C -->|No| D[Unauthorized]
 
 C -->|Yes| E[Verify Token]
 
-E --> F{Valid Token?}
+E --> F{Valid Token}
 
-F -->|No| G[401 Unauthorized]
+F -->|No| G[Unauthorized]
 
-F -->|Yes| H[Attach req.userInfo]
+F -->|Yes| H[Attach User Info]
 
-H --> I[next()]
+H --> I[Next]
 ```
 
 ---
