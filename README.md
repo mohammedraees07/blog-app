@@ -258,21 +258,20 @@ A user should not be able to modify another user's blog.
 ```mermaid
 flowchart TD
 
-A[Update/Delete Request]
-
+A[Update Delete Request]
 --> B[Find Blog]
 
-B --> C{Blog Exists?}
+B --> C{Blog Exists}
 
-C -->|No| D[404 Not Found]
+C -->|No| D[Not Found]
 
-C -->|Yes| E[Compare Author]
+C -->|Yes| E[Compare Owner]
 
-E --> F{author == currentUser?}
+E --> F{Owner Matches}
 
-F -->|No| G[403 Forbidden]
+F -->|No| G[Forbidden]
 
-F -->|Yes| H[next()]
+F -->|Yes| H[Allow Request]
 ```
 
 ---
