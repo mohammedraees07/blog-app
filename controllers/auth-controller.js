@@ -10,7 +10,7 @@ export const registerUser = async(req,res)=>{
         const checkExistingUser = await User.findOne({ $or : [{username},{email}]})
 
         if(checkExistingUser){
-            return res.status(400).json({
+            return res.status(409).json({
                 success : false,
                 message : 'User already exists with this username or email. try using different username or email'
             })
@@ -67,10 +67,14 @@ export const loginUser = async(req,res)=>{
         const isPasswordMatch = await bcrypt.compare(password, user.password)
 
         if(!isPasswordMatch){
-            return res.status(401).json({
+            return res.status(400).json({
                 success : false,
                 message : 'Invalid credentials. Please enter valid credentials'
             })
+        }
+
+        if(!process.env.JWT_SECRET_KEY){
+            throw new Error("JWT secret missing");
         }
 
         const accessToken = jwt.sign(
