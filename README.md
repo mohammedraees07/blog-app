@@ -35,6 +35,8 @@ More importantly, it helped me understand **why these concepts exist** rather th
 * Mongoose
 * JWT
 * bcryptjs
+* Multer
+* Cloudinary
 
 ---
 
@@ -51,10 +53,13 @@ More importantly, it helped me understand **why these concepts exist** rather th
 ## Blog Management
 
 * Create Blog
+* Upload Blog Images
 * Get All Blogs
 * Get Blog By ID
 * Update Blog
+* Replace Blog Images
 * Delete Blog
+* Delete Associated Cloudinary Images
 
 ## Authorization
 
@@ -120,6 +125,10 @@ project/
 ```javascript
 {
   title,
+  image: {
+    url,
+    publicId
+  },
   content,
   author
 }
@@ -143,6 +152,8 @@ BLOG {
     ObjectId _id
     string title
     string content
+    string imageUrl
+    string imagePublicId
     ObjectId author
 }
 ```
@@ -245,6 +256,26 @@ C --> D[Read Title and Content]
 D --> E[Create Blog]
 
 E --> F[author = req.userInfo.userId]
+
+F --> G[Save Blog]
+```
+
+---
+# Image Upload Flow
+
+```mermaid
+flowchart TD
+
+A[Create Blog Request]
+--> B[Multer Receives File]
+
+B --> C[Upload To Cloudinary]
+
+C --> D[Receive URL & PublicId]
+
+D --> E[Delete Temporary Local File]
+
+E --> F[Store URL & PublicId In Blog]
 
 F --> G[Save Blog]
 ```
@@ -507,8 +538,6 @@ Once those decisions became clear, the implementation became much easier.
 * Search Blogs
 * Comments System
 * Likes
-* Cloudinary Image Uploads
-* File Upload Middleware
 * Input Validation
 * Rate Limiting
 * Docker Deployment
@@ -530,6 +559,7 @@ It is about understanding data flow:
 Request
 → Middleware
 → Controller
+→ Cloudinary
 → Database
 → Response
 ```
