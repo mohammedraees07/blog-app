@@ -3,6 +3,7 @@ import Blog from "../models/Blog.js"
 
 const changesMiddleware = async (req,res,next)=>{
     const blog = await Blog.findById(req.params.id)
+    req.blog = blog;
     if(!blog){
          return res.status(404).json({
         success: false,

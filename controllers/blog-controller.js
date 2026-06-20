@@ -1,11 +1,20 @@
 import Blog from "../models/Blog.js";
+import uploadToCloudinary from "../helpers/upload-image.js";
+import cloudinary from "../../NodeJS Auth/config/cloudinary.js";
 
 export const createBlog = async (req, res) => {
   try {
     const { title, content } = req.body;
     const author = req.userInfo.userId;
 
-    const newlyCreatedBlog = await Blog.create({ title, content, author });
+    const { url, publicId } = await uploadToCloudinary(req.file.path);
+
+    const newlyCreatedBlog = await Blog.create({
+      title,
+      image: { url, publicId },
+      content,
+      author,
+    });
 
     res.status(201).json({
       success: true,
@@ -13,6 +22,7 @@ export const createBlog = async (req, res) => {
       data: newlyCreatedBlog,
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({
       success: false,
       message: "failed to create blog. Please try again",
@@ -71,6 +81,9 @@ export const getBlogById = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const blog = await Blog.findByIdAndDelete(req.params.id);
+
+    await cloudinary.uploader.destroy(blog.image.publicId);
+
     return res.status(200).json({
       success: true,
       message: "Blog deleted successfully",
@@ -82,23 +95,49 @@ export const deleteBlog = async (req, res) => {
     });
   }
 };
+
 export const updateBlog = async (req, res) => {
   try {
-    const { title, content } = req.body;
-  
+    
+    let image, title, content;
 
-    const blog = await Blog.findByIdAndUpdate(req.params.id,{title,content},{new : true});
+    if (!req.body.title?.trim()) {
+      title = req.blog.title;
+    } else {
+      title = req.body.title;
+    }
 
-  
+    if (!req.file) {
+      image = req.blog.image;
+    } else {
+      await cloudinary.uploader.destroy(req.blog.image.publicId);
+      const { url, publicId } = await uploadToCloudinary(req.file.path);
+      image = {
+        url,
+        publicId,
+      };
+    }
+
+    if (!req.body.content?.trim()) {
+      content = req.blog.content;
+    } else {
+      content = req.body.content;
+    }
+    const updateData = { title, image, content };
+
+    const data = await Blog.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
     return res.status(200).json({
       success: true,
       message: "Blog updated successfully",
-      data : blog
+      data: data,
     });
   } catch (error) {
-    res.status(404).json({
-      success: false,
-      message: "No blog found by this id",
-    });
-  }
+  console.log(error);
+
+  res.status(404).json({
+    success: false,
+    message: error.message,
+  });
+}
 };
