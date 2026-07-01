@@ -1,6 +1,6 @@
 import Blog from "../models/Blog.js";
 import uploadToCloudinary from "../helpers/upload-image.js";
-import cloudinary from "../../NodeJS Auth/config/cloudinary.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const createBlog = async (req, res) => {
   try {
